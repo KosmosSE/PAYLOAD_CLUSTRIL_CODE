@@ -14,10 +14,10 @@
 
 
 /**
- * @brief Estrutura de dados para armazenar informações de sensores e status para o SD e enviar pelo LoRa.
+ * @brief Estrutura de dados para armazenar informações de sensores e status para o SD.
  *
  * Esta estrutura é usada para coletar e armazenar vários tipos de dados de diferentes sensores e 
- * indicadores de status. Destina-se ao uso para registro de dados em um cartão SD e envio via LoRa.
+ * indicadores de status. Destina-se ao uso para registro de dados em um cartão SD.
  * 
  * A estrutura contém os seguintes campos:
  * 

@@ -48,8 +48,6 @@ bool initPorts();
 
 void BuzzerSound();
 
-void BottomInit();
-
 bool AdxlLock(double abs_accel);
 
 /**

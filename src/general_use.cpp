@@ -1,10 +1,6 @@
 #include "general_use.h"
 #include "sensors.h"
 
-void BottomInit() {
-  
-}
-
 bool initPorts(){
 
   pinMode(Buzzer, OUTPUT); // Inicia o pino do buzzer
