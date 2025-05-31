@@ -16,7 +16,6 @@ bool initI2CSensors(Adafruit_BME280 &bme_1, Adafruit_ADXL375 &adxl) {
         Adafruit_BME280::FILTER_X16,           // Coeficiente do filtro IIR
         Adafruit_BME280::STANDBY_MS_0_5        // Taxa de atualização (aproximadamente 200 Hz)
     );
-
     // Inicializa o Acelerômetro
     if (!adxl.begin(ADXL_I2C)) {
         Serial.println("Erro: Falha ao iniciar ADXL375");

@@ -35,12 +35,12 @@ void setup()
 
   initI2CSensors(bme_1, adxl); // Inicializa todos os sensores I2C
 
-  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(buttonPin, INPUT_PULLDOWN);
 
   InitUARTSensors(gpsSerial); // Inicializa todos os sensores UART
   initPorts();                // Inicializa todos os pinos usados no sistema
 
-  // BuzzerSound(); //Toca o buzzer para indicar que o sistema iniciou com sucesso
+  //BuzzerSound(); //Toca o buzzer para indicar que o sistema iniciou com sucesso
 
   AccelCalibration(&adxl, adxl_calib, 1000); // Calibra o ADXL375
 
@@ -53,7 +53,7 @@ void loop()
 
   if (!systemStarted)
   {
-    if (digitalRead(buttonPin) == LOW)
+    if (digitalRead(buttonPin) == HIGH)
     { // Pressionado (com PULLUP)
       systemStarted = true;
       Serial.println("Botão pressionado. Sistema iniciado.");
@@ -75,18 +75,17 @@ void loop()
 
   if (checkAdxlLockReturn)
   { // Se a aceleração for maior que o limite, o AdxlLock será ativado
-  }
+  } 
   //-------------------------------------------------------------------------------------------------------------------
   // Parte do SD--------------------------------------------------------------------------------------------------------
 
   readPressureAndTemperatureAndHumidityBME(&bme_1, &SDdata); // Leitura da pressão e temperatura do barometro 1
 
   bool CheckSDReturn = checkSD(SD); // Verifica se o cartão SD está conectado
-
   readGPS(gps, &SDdata, gpsSerial); // Leitura dos dados de GPS
 
-  WriteToSD(SD, &SDdata, "/data.txt", CheckSDReturn); // Escreve os dados no cartão SD7
-  delay(40);
-
+  WriteToSD(SD, &SDdata, "/data_Clustril.txt", CheckSDReturn); // Escreve os dados no cartão SD7
+  delay(10);
+ 
   //-------------------------------------------------------------------------------------------------------------------
 }

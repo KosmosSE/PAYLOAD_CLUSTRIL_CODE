@@ -14,7 +14,7 @@ void WriteToSD(fs::FS &fs, clustril_data_t *SDdata, const char *path, bool SDsta
     
     // Check if file is empty and write headers if needed
     if (file.size() == 0) {
-        file.println("Temperatura_1 (°C),Pressão_1 (Pa),Altitude_1 (m), Umidade_1 (%), accel_ax (m/s^2), accel_ay (m/s^2), accel_az (m/s^2), Latitude, Longitude");
+        file.println("Temperatura_1 (°C),Pressão_1 (Pa),Altitude_1 (m), Umidade_1 (%), accel_ax (m/s^2), accel_ay (m/s^2), accel_az (m/s^2), Latitude, Longitude, Tempo");
     }
     
     // Write sensor data in CSV format
@@ -38,6 +38,7 @@ void WriteToSD(fs::FS &fs, clustril_data_t *SDdata, const char *path, bool SDsta
     file.print(",");
     file.print(SDdata->lon);
     file.print(",");
+    file.print(millis()); 
 
     file.print("\n");
     
