@@ -1,89 +1,86 @@
-Clustril - Sistema de Aquisição de Dados com ESP32
-Este projeto implementa um sistema embarcado com ESP32 para aquisição e registro de dados ambientais e de movimento. Os sensores utilizados são o barômetro BME280, o acelerômetro ADXL375 e um módulo GPS. Os dados são processados e salvos em um cartão SD para posterior análise.
+# Sistema de Aquisição de Dados com ESP32
 
-Pinos Utilizados
-Função	Componente	Pino ESP32
-SDA (I2C)	BME280, ADXL375	GPIO 21
-SCL (I2C)	BME280, ADXL375	GPIO 22
-RX (UART2)	GPS	GPIO 16
-TX (UART2)	GPS	GPIO 17
-Botão de inicialização	Entrada digital	GPIO 4 (exemplo)
-SPI (SD Card)	Cartão SD	Definido na biblioteca SD (ex: GPIO 5, 18, 19, 23)*
+Este projeto implementa um sistema de aquisição de dados utilizando um **ESP32**, integrando sensores ambientais e de movimento, além de GPS e armazenamento em cartão SD. É ideal para aplicações embarcadas em foguetes, drones ou sistemas móveis que exigem coleta e registro de dados em tempo real.
 
-*A configuração exata dos pinos do cartão SD depende do modelo de placa e da biblioteca utilizada. Ajuste conforme seu hardware.
+---
 
-Componentes Principais
-ESP32
+## Arquitetura do Sistema
 
-Barômetro BME280
+### Sensores Utilizados
 
-Acelerômetro ADXL375
+| Sensor         | Função                            | Interface | Pino(s)         |
+|----------------|------------------------------------|-----------|-----------------|
+| **BME280**     | Temperatura, umidade, pressão     | I2C       | GPIO 21 (SDA), GPIO 22 (SCL) |
+| **ADXL375**    | Aceleração 3 eixos                | I2C       | GPIO 21 (SDA), GPIO 22 (SCL) |
+| **GPS (TinyGPS++)** | Localização via satélite    | UART      | RX: GPIO 16, TX: GPIO 17     |
+| **Botão de Start** | Inicialização manual do sistema | Digital   | GPIO 4           |
+| **Buzzer**     | Sinal sonoro de feedback          | Digital   | (definir no `initPorts`)    |
+| **Cartão SD**  | Armazenamento dos dados           | SPI       | (definir pinos no hardware) |
 
-Módulo GPS (compatível com TinyGPS++)
+---
 
-Cartão SD
+## Funcionalidades
 
-Botão físico (start manual)
+### Inicialização
+- **Calibração automática** do acelerômetro ADXL375.
+- Leitura da altitude de referência com o BME280.
 
-Funcionalidades
-Inicialização de sensores I2C e UART
+### Loop Principal
+- Leitura de dados dos sensores (aceleração, pressão, temperatura, umidade e GPS).
+- Cálculo da aceleração absoluta para detectar eventos com base em threshold.
+- Escrita contínua em arquivo de texto no cartão SD: `/data_Clustril.txt`.
 
-Calibração automática do acelerômetro
+---
 
-Cálculo da aceleração absoluta (norma do vetor aceleração)
+## Estrutura de Código
 
-Cálculo e calibração de altitude via BME280
+### `main.cpp`
+- Inicializa sensores e interfaces.
+- Realiza a lógica principal de coleta e gravação dos dados.
 
-Leitura de dados de GPS
+### `sensors.h` e `sensors.cpp`
+- Funções auxiliares para leitura e calibração de sensores.
+- Cálculo da aceleração corrigida.
+- Interação com o GPS (TinyGPSPlus).
 
-TimeLock baseado em aceleração (evento de alta aceleração)
+### `general_use.h`
+- Definições gerais, estruturas de dados e pinos utilizados.
 
-Escrita de dados estruturados no cartão SD
+---
 
-Sistema inicia apenas após acionamento do botão
+## Formato dos Dados no SD
 
-Fluxo de Execução
-Sistema aguarda o pressionamento do botão de inicialização.
+Os dados são gravados no formato texto com separação entre os campos, contendo:
 
-Ao iniciar:
+- Aceleração (X, Y, Z)
+- Temperatura (°C)
+- Pressão (Pa)
+- Umidade (%)
+- Latitude e Longitude (GPS)
 
-Calibra o acelerômetro (média de 1000 leituras).
+---
 
-Lê altitude inicial e define como referência.
+## Compilação com PlatformIO
 
-No loop principal:
+Utilize o seguinte `platformio.ini` para configurar corretamente o ambiente de desenvolvimento com PlatformIO:
 
-Leitura de aceleração (com compensação de calibração).
+```ini
+[env:esp32dev]
+platform = espressif32
+board = esp32dev
+framework = arduino
+monitor_speed = 115200
+upload_speed = 921600
 
-Verificação de evento por aceleração absoluta (TimeLock).
+lib_deps =
+    adafruit/Adafruit BME280 Library@^2.2.2
+    adafruit/Adafruit Unified Sensor@^1.1.9
+    adafruit/Adafruit ADXL375 Library@^1.0.5
+    mikalhart/TinyGPSPlus@^1.0.3
 
-Leitura de pressão, temperatura e umidade.
+build_flags =
+    -DCORE_DEBUG_LEVEL=0
+    -DDEBUG_DISABLED
 
-Leitura de dados GPS (se disponíveis).
-
-Escrita dos dados no cartão SD.
-
-Estrutura dos Arquivos
-main.cpp: lógica principal do sistema.
-
-sensors.h/.cpp: funções para manipulação e leitura dos sensores.
-
-general_use.h: definições gerais, tipos de dados e macros.
-
-Formato de Dados Gravados
-Os dados são salvos no arquivo /data_Clustril.txt, com formato estruturado. Exemplo de colunas:
-
-sql
-Copiar
-Editar
-timestamp, pressure_1, temperature_1, humidity_1, altitude_1, accel_ax, accel_ay, accel_az, accel_abs, lat, lon
-Dependências
-Adafruit BME280
-
-Adafruit Sensor
-
-Adafruit ADXL375
-
-TinyGPS++
-
-Biblioteca SD padrão do ESP32/Arduino
+board_build.flash_mode = dio
+board_build.partitions = default_16MB.csv
